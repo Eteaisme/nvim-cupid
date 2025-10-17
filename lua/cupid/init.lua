@@ -19,10 +19,22 @@ function M.toggle()
 	M.enabled = not M.enabled
 	if M.enabled then
 		vim.notify("Cupid enabled 💘")
+
 		vim.api.nvim_set_keymap("i", "<CR>", "v:lua.CupidHandleEnter()", { expr = true, noremap = true })
+
+		vim.api.nvim_create_autocmd("InsertLeave", {
+			pattern = "*",
+			callback = function()
+				if M.enabled and M.options.add_vertical then
+					core.update_vertical_connectors(M.options)
+				end
+			end,
+			group = vim.api.nvim_create_augroup("CupidVertical", { clear = true }),
+		})
 	else
 		vim.notify("Cupid disabled ❌")
 		pcall(vim.api.nvim_del_keymap, "i", "<CR>")
+		vim.api.nvim_clear_autocmds({ group = "CupidVertical" })
 	end
 end
 
@@ -35,10 +47,6 @@ function _G.CupidHandleEnter()
 	local lines = vim.api.nvim_buf_get_lines(0, 0, row, false)
 	local depth = core.compute_depth(lines, M.options.arrow, M.options.indent_width)
 	local indent = string.rep(" ", depth * M.options.indent_width)
-
-	if M.options.add_vertical then
-		core.add_vertical_connectors(lines, depth, M.options)
-	end
 
 	return "\n" .. indent .. M.options.arrow .. " "
 end
