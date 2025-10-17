@@ -42,16 +42,16 @@ function _G.CupidHandleEnter(kind)
 	if not M.enabled then
 		return "\n"
 	end
-
 	local depth = core.current_depth(M.options)
 	if kind == "child" then
 		depth = depth + 1
 	end
-
-	-- fixed: compute exact spaces by depth * indent_width
-	local indent_spaces = math.floor(depth) * M.options.indent_width
-	local indent = string.rep(" ", indent_spaces)
-
+	local indent = string.rep(" ", math.floor(depth) * M.options.indent_width)
+	vim.schedule(function()
+		if M.enabled and M.options.add_vertical then
+			core.update_vertical_connectors(M.options)
+		end
+	end)
 	return "\n" .. indent .. M.options.arrow .. " "
 end
 
