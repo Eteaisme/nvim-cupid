@@ -42,9 +42,7 @@ function _G.CupidHandleEnter(kind)
 	if not M.enabled then
 		return "\n"
 	end
-	local row = vim.api.nvim_win_get_cursor(0)[1] - 1
-	local lines = vim.api.nvim_buf_get_lines(0, 0, row, false)
-	local depth = core.compute_depth(lines, M.options.arrow, M.options.indent_width)
+	local depth = core.current_depth(M.options)
 	if kind == "child" then
 		depth = depth + 1
 	end
