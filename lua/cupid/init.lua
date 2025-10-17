@@ -46,7 +46,7 @@ function _G.CupidHandleEnter(kind)
 	if kind == "child" then
 		depth = depth + 1
 	end
-	local indent = string.rep(" ", depth * M.options.indent_width)
+	local indent = string.rep(" ", math.floor(depth) * M.options.indent_width)
 	return "\n" .. indent .. M.options.arrow .. " "
 end
 

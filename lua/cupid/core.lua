@@ -6,7 +6,7 @@ local function depth_of_line(line, arrow, indent_width)
 	end
 	if line:match("^%s*" .. arrow) then
 		local spaces = line:match("^(%s*)") or ""
-		return #spaces / indent_width
+		return math.floor(#spaces / indent_width)
 	end
 	return nil
 end
@@ -14,15 +14,15 @@ end
 function M.current_depth(opts)
 	local row = vim.api.nvim_win_get_cursor(0)[1] - 1
 	local cur = vim.api.nvim_buf_get_lines(0, row, row + 1, false)[1]
-	local cur_depth = depth_of_line(cur, opts.arrow, opts.indent_width)
-	if cur_depth ~= nil then
-		return cur_depth
+	local depth = depth_of_line(cur, opts.arrow, opts.indent_width)
+	if depth ~= nil then
+		return depth
 	end
-	local lines = vim.api.nvim_buf_get_lines(0, 0, row, false)
-	for i = #lines, 1, -1 do
-		local d = depth_of_line(lines[i], opts.arrow, opts.indent_width)
-		if d ~= nil then
-			return d
+	if cur == "" then
+		local prev = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1]
+		local pd = depth_of_line(prev, opts.arrow, opts.indent_width)
+		if pd ~= nil then
+			return pd
 		end
 	end
 	return 1
@@ -34,7 +34,7 @@ function M.update_vertical_connectors(options)
 		local line = lines[i]
 		if line:match("^%s*" .. options.arrow) then
 			local spaces = line:match("^(%s*)") or ""
-			local depth = #spaces / options.indent_width
+			local depth = math.floor(#spaces / options.indent_width)
 			local pos = math.max(0, depth * options.indent_width - 1)
 			if pos > 0 and (#line < pos or line:sub(pos, pos) ~= options.vertical) then
 				local updated = line:sub(1, pos - 1) .. options.vertical .. line:sub(pos + 1)
