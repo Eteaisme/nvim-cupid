@@ -23,8 +23,18 @@ function M.toggle()
 	end
 end
 
-function M.insert_element()
+function M.handle_enter()
+	if not M.enabled then
+		return
+	end
 	core.insert_element(M.options)
 end
+
+vim.api.nvim_create_autocmd("TextChangedI", {
+	pattern = "*",
+	callback = function()
+		M.handle_enter()
+	end,
+})
 
 return M
